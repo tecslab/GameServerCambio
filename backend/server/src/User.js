@@ -7,6 +7,7 @@ class User {
     id = ""
     ws = null
     name = ""
+    position = ""
     rooms = {}
 
     constructor(id, name, ws) {
