@@ -4,8 +4,8 @@
  */
 
 class User {
-    id = ""
-    ws = null
+    id = "";
+    ws = null;
     name = ""
     position = ""
     rooms = {}
