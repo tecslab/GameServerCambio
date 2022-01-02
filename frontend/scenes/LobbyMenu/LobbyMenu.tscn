@@ -201,8 +201,8 @@ align = 1
 margin_top = 48.0
 margin_right = 520.0
 margin_bottom = 135.0
-custom_fonts/font = ExtResource( 9 )
 custom_colors/font_color_uneditable = Color( 0, 0, 0, 1 )
+custom_fonts/font = ExtResource( 9 )
 align = 1
 editable = false
 placeholder_text = "red sus"
@@ -282,6 +282,7 @@ text = "/* A template by Anicet Nougaret (@AniC_dev)
  * Credit is due when using this within your projects, commercial or not.
  * This is only the frontend, you need the server to be running */"
 align = 0
+
 [connection signal="pressed" from="Control/MainMenu/ChooseName/ButtonSetName" to="." method="_on_ButtonSetName_pressed"]
 [connection signal="pressed" from="Control/MainMenu/Join/ButtonJoin" to="." method="_on_ButtonJoin_pressed"]
 [connection signal="pressed" from="Control/MainMenu/Create" to="." method="_on_Create_pressed"]
