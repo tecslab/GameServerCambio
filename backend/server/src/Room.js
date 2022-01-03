@@ -10,13 +10,13 @@ class Room {
     id = englishWordGen()[0];
     users = [];
     usersStates = {};
-    maxUsers = 1024;
+    maxUsers = 4;
     started = false;
-    positions = ['Pos1', 'Pos2', 'Pos3', 'Pos4'];
+    //positions = ['Pos1', 'Pos2', 'Pos3', 'Pos4'];
     frontMazoCard = null;
     descarteCard = null;
     turnCount = 0;
-    turnToken = ""; // Guarda el nombre de la posición con el turno actual
+    turnToken = 0; // token del turno actual. Valores desde 0 a maxUser - 1
 
     constructor() {}
 
@@ -34,13 +34,14 @@ class Room {
     }
 
     onUserLeft(user) {
-        this.sendDataToEveryone(messages.USER_LEFT(this.id, user.id))
-        this.users.splice(this.users.indexOf(user), 1)
+        this.sendDataToEveryone(messages.USER_LEFT(this.id, user.id));
+        this.users.splice(this.users.indexOf(user), 1);
     }
 
     onStart() {
-        this.started = true
-        this.sendDataToEveryone(messages.GAME_STARTED(this.id))
+        this.started = true;
+        this.sendDataToEveryone(messages.GAME_STARTED(this.id));
+        this.users.map((user,index) => user.onStart(index));
     }
 
     onDeleted() {
@@ -63,6 +64,22 @@ class Room {
     getHost() {
         return this.users[0]
     }
+
+    //******  Métodos del juego  *******
+
+    nextToken(prevToken){
+        // Genera un token actualizado
+        let lastPosition= this.maxUsers-1;
+        if (prevToken === lastPosition){
+            return 0;
+        }else{
+            return prevToken + 1;
+        }
+    }
+
+
+
+
 }
 
 module.exports = Room
