@@ -47,6 +47,8 @@ class User {
         }
     }
 
+    //Métodos para jugar
+
     onStart(position) {
         for (let i=0; i<this.initialCards; i++){
             let cardInstance = {location: i , card:new Card};
@@ -57,6 +59,30 @@ class User {
             this.cartas.push(cardInstance);
         }
         this.position = position;
+    }
+
+    pushCard(location){
+        let cardIndex = this.cartas.findIndex(card=>card.location==location);
+        this.cartas[cardIndex].card = new Card;
+    }
+
+    getCard(location){
+        let cardIndex = this.cartas.findIndex(card=>card.location==location);
+        return this.cartas[cardIndex].card;
+    }
+
+    deleteCard(location){
+        let cardIndex = this.cartas.findIndex(card=>card.location==location);
+        this.cartas[cardIndex].card = null;
+    }
+
+    suma(){
+        let suma=0;
+        for (let i in this.cartas){
+            let costoCard = this.cartas[i].card?this.cartas[i].card.costo:0;
+            suma += costoCard;
+        }
+        return suma;
     }
 }
 
