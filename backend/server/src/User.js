@@ -13,7 +13,7 @@ class User {
     rooms = {};
     initialCards = 4;
     cardsLimit=6;
-    cartas = [];
+    cartas = []; //{location:location,card:Card{}}
 
     constructor(id, name, ws) {
         this.id = id;

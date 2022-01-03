@@ -77,9 +77,11 @@ class Room {
         }
     }
 
-
-
-
+    onFinish(){
+        let puntajes = [];
+        this.users.map(user=> puntajes.push({name:user.name, value:user.suma()}) );
+        return puntajes;
+    }
 }
 
 module.exports = Room
