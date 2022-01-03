@@ -25,8 +25,8 @@ let cardsSet = [
 // Se obtiene la suma para incluir casos 
 // en los que no sea uno:
 let sum = 0;
-for (let j in set) {
-    sum += set[j];
+for (let j in cardsSet) {
+    sum += cardsSet[j].probabilidad;
 }
 
 //Función para obtener un evento aleatorio a partir
@@ -34,10 +34,10 @@ for (let j in set) {
 //Basado en una funcion de distribución de probabilidad acumulativa
 module.exports = function pick_random() {
     var pick = Math.random() * sum;
-    for (let j in set) {
-        pick -= set[j];
+    for (let j in cardsSet) {
+        pick -= cardsSet[j].probabilidad;
         if (pick <= 0) {
-            return j;
+            return cardsSet[j];
         }
     }
 }
