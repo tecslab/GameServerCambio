@@ -1,9 +1,6 @@
 //Se definen las cartas y sus probabilidades
 // set of object with probabilities:
 //deberían sumar 1 si se busca que sea preciso
-let set = { 1: 4 / 54, 2: 4 / 54, 3: 4 / 54, 4: 4 / 54, 5: 4 / 54, 6: 4 / 54, 7: 4 / 54, 8: 4 / 54, 9: 4 / 54, 10: 4 / 54, J: 4 / 54, Q: 4 / 54, KN: 2 / 54, KR: 2 / 54, JKR: 2 / 54 };
-
-
 let cardsSet = [
     {name:'1', probabilidad: 4 / 54, costo:1},
     {name:'2', probabilidad: 4 / 54, costo:2},
@@ -32,7 +29,7 @@ for (let j in cardsSet) {
 //Función para obtener un evento aleatorio a partir
 //de una función de densidad de probabilidad
 //Basado en una funcion de distribución de probabilidad acumulativa
-module.exports = function pick_random() {
+module.exports = function pickRandom() {
     var pick = Math.random() * sum;
     for (let j in cardsSet) {
         pick -= cardsSet[j].probabilidad;
