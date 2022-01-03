@@ -4,7 +4,6 @@
  */
 
 const Card = require('./Card');
-const Card = require('./src/Card');
 
 class User {
     id = "";
@@ -15,7 +14,6 @@ class User {
     initialCards = 4;
     cardsLimit=6;
     cartas = [];
-    //cartas=[{location:2,carta:Card},...]
 
     constructor(id, name, ws) {
         this.id = id;
@@ -49,11 +47,16 @@ class User {
         }
     }
 
-    onStart() {
-        for (let i=0; i<this.cardsLimit; i++){
-            let cardInstance = {position: i , card:new Card};
+    onStart(position) {
+        for (let i=0; i<this.initialCards; i++){
+            let cardInstance = {location: i , card:new Card};
             this.cartas.push(cardInstance);
         }
+        for (let i=this.initialCards;i<this.cardsLimit; i++){
+            let cardInstance = {location: i , card: null};
+            this.cartas.push(cardInstance);
+        }
+        this.position = position;
     }
 }
 
