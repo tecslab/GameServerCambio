@@ -12,6 +12,11 @@ class Room {
     usersStates = {};
     maxUsers = 1024;
     started = false;
+    positions = ['Pos1', 'Pos2', 'Pos3', 'Pos4'];
+    frontMazoCard = null;
+    descarteCard = null;
+    turnCount = 0;
+    turnToken = ""; // Guarda el nombre de la posición con el turno actual
 
     constructor() {}
 
