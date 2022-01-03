@@ -3,12 +3,19 @@
  * See LICENCE.txt
  */
 
+const Card = require('./Card');
+const Card = require('./src/Card');
+
 class User {
     id = "";
     ws = null;
-    name = ""
-    position = ""
-    rooms = {}
+    name = "";
+    position = "";
+    rooms = {};
+    initialCards = 4;
+    cardsLimit=6;
+    cartas = [];
+    //cartas=[{location:2,carta:Card},...]
 
     constructor(id, name, ws) {
         this.id = id;
@@ -39,6 +46,13 @@ class User {
         return {
             name: this.name,
             id: this.id
+        }
+    }
+
+    onStart() {
+        for (let i=0; i<this.cardsLimit; i++){
+            let cardInstance = {position: i , card:new Card};
+            this.cartas.push(cardInstance);
         }
     }
 }

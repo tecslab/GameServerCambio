@@ -3,15 +3,13 @@ const randomCard = require('./randomCard');
 class Card{
   name="";
   costo= null;
-  owner="";
-  position ="";
+  efecto= "";
 
-  constructor(owner, position){
+  constructor(){
     let carta = this.crearRandom();
     this.name = carta.name;
     this.costo = carta.costo;
-    this.owner = owner; // Ower puede ser el id del jugador, el mazo o el descarte (Da información de a donde pertenece)
-    this.position = position
+    this.efecto = carta.efecto;
   }
 
   crearRandom(){
