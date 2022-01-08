@@ -9,6 +9,7 @@ class User {
     id = "";
     ws = null;
     name = "";
+    type = "";
     position = "";
     rooms = {};
     initialCards = 4;
@@ -61,14 +62,14 @@ class User {
         this.position = position;
     }
 
-    pushCard(location){
+    pushCard(location, card){
         let cardIndex = this.cartas.findIndex(card=>card.location==location);
-        this.cartas[cardIndex].card = new Card;
+        this.cartas[cardIndex].card = card;
     }
 
     getCard(location){
-        let cardIndex = this.cartas.findIndex(card=>card.location==location);
-        return this.cartas[cardIndex].card;
+        let datosCarta = this.cartas.find(card=>card.location===location);
+        return datosCarta.card;
     }
 
     deleteCard(location){

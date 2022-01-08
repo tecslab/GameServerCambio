@@ -5,6 +5,8 @@
 
 const englishWordGen = require('./wordGen')
 const messages = require('./messages')
+const Card = require('./Card');
+const Descarte = require('./Descarte');
 
 class Room {
     id = englishWordGen()[0];
@@ -14,7 +16,7 @@ class Room {
     started = false;
     //positions = ['Pos1', 'Pos2', 'Pos3', 'Pos4'];
     frontMazoCard = null;
-    descarteCard = null;
+    descarte = {};
     turnCount = 0;
     turnToken = 0; // token del turno actual. Valores desde 0 a maxUser - 1
 
@@ -41,6 +43,8 @@ class Room {
     onStart() {
         this.started = true;
         this.sendDataToEveryone(messages.GAME_STARTED(this.id));
+        this.frontMazoCard = new Card;
+        this.descarte = new Descarte();
         this.users.map((user,index) => user.onStart(index));
     }
 
@@ -81,6 +85,59 @@ class Room {
         let puntajes = [];
         this.users.map(user=> puntajes.push({name:user.name, value:user.suma()}) );
         return puntajes;
+    }
+
+    getMazoCard(){
+        this.frontMazoCard = new Card;
+    }
+
+    localizarCarta(idLugar, location){
+        //Encuentra el valor de la carta en la posición solicitada
+        //idLugar puede ser mazo, descarte o un id de un Jugador
+        let carta={}
+        let owner;
+        switch(idLugar){
+            case 'mazo':
+                carta = this.frontMazoCard;
+                break;
+            case 'descarte':
+                carta = this.descarteCard;
+                break;
+            default:
+                // La carta tiene id de jugador(user)
+                owner = this.users.find(user => user.id === idLugar);
+                carta = owner.getCard(location);
+                break;
+        }
+        return carta;
+    }
+
+    pushCard(idLugar, location, card){
+        let owner;
+        switch(idLugar){
+            case 'mazo':
+            //Si el cambio es con el mazo la carta va al descarte
+                this.descarte.pushCard(card);
+                this.frontMazoCard = null;
+                break;
+            case 'descarte':
+                this.descarte.pushCard(card);
+                break;
+            default:
+                // La carta tiene id de jugador(user)
+                owner = this.users.find(user => user.id === idLugar);
+                owner.pushCard(location,card);
+                break;
+        }
+    }
+
+    cambiarCartas(datosCarta1, datosCarta2){
+        //Se puede cambiar entre 2 cartas, entre 1 carta y el mazo o entre 1 carta y el descarte
+        //datosCartaX {idLugar:user.id, location:cartas.location}
+        let carta1 = this.localizarCarta(datosCarta1.idLugar, datosCarta1.location);
+        let carta2 = this.localizarCarta(datosCarta2.idLugar, datosCarta2.location);
+        this.pushCard(datosCarta1.idLugar, datosCarta1.location, carta2);
+        this.pushCard(datosCarta2.idLugar, datosCarta2.location, carta1);
     }
 }
 
