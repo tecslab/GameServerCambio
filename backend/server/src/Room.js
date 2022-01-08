@@ -139,6 +139,7 @@ class Room {
         this.pushCard(datosCarta1.idLugar, datosCarta1.location, carta2);
         this.pushCard(datosCarta2.idLugar, datosCarta2.location, carta1);
     }
+    
 }
 
 module.exports = Room

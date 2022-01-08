@@ -67,6 +67,17 @@ class User {
         this.cartas[cardIndex].card = card;
     }
 
+    penaltyCard(){
+        let cardIndex = this.cartas.findIndex(cardPlace=>cardPlace.card===null);
+        if (cardIndex != -1){
+            this.cartas[cardIndex].card = new Card;
+        }else{
+            // Ya se tienen 6 cartas
+            console.log('Agregar funcion cuando se tiene más de 6 cartas')
+            //también podría perder al pasar esto
+        }
+    }
+
     getCard(location){
         let datosCarta = this.cartas.find(card=>card.location===location);
         return datosCarta.card;
