@@ -141,7 +141,7 @@ class Room {
     }
 
     compararCartas(carta1, carta2){
-        if (carta1.card===carta2.card){
+        if (carta1.card.name===carta2.card.name){
             return true;
         }else{
             return false;
