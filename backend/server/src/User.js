@@ -96,6 +96,10 @@ class User {
         }
         return suma;
     }
+
+    verCartas(){
+        return this.cartas;
+    }
 }
 
 module.exports = User
