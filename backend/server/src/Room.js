@@ -139,6 +139,14 @@ class Room {
         this.pushCard(datosCarta1.idLugar, datosCarta1.location, carta2);
         this.pushCard(datosCarta2.idLugar, datosCarta2.location, carta1);
     }
+
+    compararCartas(carta1, carta2){
+        if (carta1.card===carta2.card){
+            return true;
+        }else{
+            return false;
+        }
+    }
     
 }
 
