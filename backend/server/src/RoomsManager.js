@@ -7,7 +7,7 @@ const Room = require('./Room')
 const messages = require('./messages')
 
 class RoomsManager {
-    rooms = {}
+    rooms = {} // {roomId:room}
 
     handleMessage(data, sender) {
         switch(data.message) {
@@ -25,6 +25,9 @@ class RoomsManager {
                 break;
             case 'send host':
                 this.sendHost(sender, data.gameId)
+                break;
+            case 'game command':
+                this.toRoomGameManager(sender, data);
                 break;
         }
     }
@@ -75,6 +78,14 @@ class RoomsManager {
     sendHost(sender, id) {
         if(this.rooms[id]) {
             sender.sendData(messages.UPDATE_HOST(id, this.rooms[id].getHost().id))
+        }
+    }
+
+    toRoomGameManager(sender, data){
+        let { gameId } = data;
+        let room = this.room[gameId];
+        if(room) {
+            room.toGameManager(sender, data);
         }
     }
 

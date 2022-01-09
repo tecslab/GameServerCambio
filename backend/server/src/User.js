@@ -51,6 +51,7 @@ class User {
     //Métodos para jugar
 
     onStart(position) {
+        // position es la posicion del jugador en el tablero
         for (let i=0; i<this.initialCards; i++){
             let cardInstance = {location: i , card:new Card};
             this.cartas.push(cardInstance);
