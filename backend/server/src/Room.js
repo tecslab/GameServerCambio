@@ -39,7 +39,7 @@ class Room {
     onStart() {
         this.started = true;
         this.sendDataToEveryone(messages.GAME_STARTED(this.id));
-        this.gameManager = new GameManager(this.users);
+        this.gameManager = new GameManager(this);
         this.users.map((user,index) => user.onStart(index));
     }
 

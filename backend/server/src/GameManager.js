@@ -1,29 +1,34 @@
 const Card = require('./Card');
 const Descarte = require('./Descarte');
+const timeTurno = 8000;
+const timePreJuego = 8000; //tiempo en milisegundos que dura el prejuego
+const messages = require('./messages');
 
 class GameManager{
   players=[];
+  room={};
   motorFases={};
   frontMazoCard = null;
   descarte = {};
+  descarteActivo = false; // Si está activo se puede tomar la carta que está en el descarte
   turnCount = 0;
   turnToken = 0; // token del turno actual. Valores desde 0 a maxUser - 1
 
-  constructor(players){
-    this.players = players;
+  constructor(room){
+    this.players = room.users;
+    this.room = room;
     this.motorFases = new MotorFases();
     this.frontMazoCard = new Card;
     this.descarte = new Descarte();
   }
 
   handleMessage(player, data) {
-    let message = data.message;
-    switch (message){
+    let { command } = data;
+    switch (command){
       case 'cartaInicial':
         this.verCartaInicial(player);
         break;
     }
-
   }
 
   verCartaInicial(player, data){
@@ -31,17 +36,30 @@ class GameManager{
     if (fase===this.motorFases.getFaseActual()){
       let card = player.getCard(cardLocation);
       player.sendData(card);
-    }   
+    }
   }
 
+  startGame(){
+    setTimeout(() => {
+      this.motorFases.avanzar();
+    },timePreJuego);
+    this.room.sendDataToEveryone()
+  }
 
+  /* startGame(){
+    setInterval(()=>{
+      this.nextToken(this.turnToken);
+      this.turnCount +=1;
+    },timeTurno);
+  } */
+  
   nextToken(prevToken){
     // Genera un token actualizado
     let lastPosition= this.maxUsers-1;
     if (prevToken === lastPosition){
-        return 0;
+      return 0;
     }else{
-        return prevToken + 1;
+      return prevToken + 1;
     }
   }
 
@@ -77,22 +95,22 @@ class GameManager{
   }
 
   pushCard(idLugar, location, card){
-      let owner;
-      switch(idLugar){
-          case 'mazo':
-          //Si el cambio es con el mazo la carta va al descarte
-              this.descarte.pushCard(card);
-              this.frontMazoCard = null;
-              break;
-          case 'descarte':
-              this.descarte.pushCard(card);
-              break;
-          default:
-              // La carta tiene id de jugador(user)
-              owner = this.users.find(user => user.id === idLugar);
-              owner.pushCard(location,card);
-              break;
-      }
+    let owner;
+    switch(idLugar){
+      case 'mazo':
+      //Si el cambio es con el mazo la carta va al descarte
+        this.descarte.pushCard(card);
+        this.frontMazoCard = null;
+        break;
+      case 'descarte':
+        this.descarte.pushCard(card);
+        break;
+      default:
+        // La carta tiene id de jugador(user)
+        owner = this.users.find(user => user.id === idLugar);
+        owner.pushCard(location,card);
+        break;
+    }
   }
 
   cambiarCartas(datosCarta1, datosCarta2){
@@ -113,20 +131,35 @@ class GameManager{
   }
 }
 
+// ¨*************************************************
+//             Implementa motor de fases
+// ¨*************************************************
+
 class MotorFases{
 
-  fasesJuego = ['preJuego', 'Juego', 'ultimaRonda', 'Fin'];
+  fasesJuego = ['preJuego', 'etapa1', 'etapa2', 'ultimaRonda', 'Fin'];
   indexFaseActual = 0;
 
-  constructor(){}
+  //constructor(){}
+  constructor(){
+  }
 
   avanzar(){
-    this.indexFaseActual += 1;
+    if (this.fasesJuego[this.indexFaseActual]==="etapa2"){
+      this.indexFaseActual = 1;  
+    }else{
+      this.indexFaseActual += 1;
+    }
+  }
+
+  ultimaRonda(){
+    this.indexFaseActual = 3;
   }
 
   getFaseActual(){
     return this.fasesJuego[this.indexFaseActual];
   }
+
 }
 
 module.exports = GameManager;
