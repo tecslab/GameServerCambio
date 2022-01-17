@@ -14,5 +14,13 @@ module.exports = {
     ROOM_DELETED: (roomId) => ({message:"Game deleted", roomId:roomId}),
     GAME_STARTED: (roomId) => ({message:"Game started", roomId:roomId}),
     // Game messages
-    CARTA_INICIAL: () => ({message:"Ver carta inicial"})
-}
+    CARTA_INICIAL: {message:"Ver carta inicial"},
+    MOSTRAR_CARTA: (card) => ({message:"Mostrar carta", card: card}),
+    PINTAR_CARTAS: (cards) => ({message:"Pintar cartas", cards})
+    CAMBIAR_CARTAS: (card1, card2) => ({message:"Cambio de cartas", card1, card2}), //Para mostrar a los jugadores que cartas se cambiaron
+    DESCARTAR_CARTAS: (card1, card2) => ({message:"Cambio de cartas", card1, card2}),
+    TURNO_ETAPA1: (token, turnoCount, card) => ({message:"Turno etapa 1", token, turnoCount, card}),
+    TURNO_ETAPA2: {message:"Turno etapa 2"},
+    ULTIMO_TURNO: {message:"Ultimo turno"},
+    FINALIZAR: (resultados) => ({message:"Fin", resultados})
+} 
