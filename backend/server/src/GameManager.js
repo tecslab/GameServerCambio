@@ -70,9 +70,13 @@ class GameManager{
       while (this.etapa1===true){
         //Espera ha que pase la etapa1 del turno
       }
+      //Etapa2
       setTimeout(()=>{
         this.etapa2=false;
       },timeEtapa2);
+      while (this.etapa2===true){
+        // Espera jasta que etapa2 sea falso
+      }
     }
   }
 
