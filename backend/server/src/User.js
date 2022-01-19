@@ -14,7 +14,7 @@ class User {
     rooms = {};
     initialCards = 4;
     cardsLimit=6;
-    cartas = []; //{location:location,card:Card{}}
+    cartas = []; //{location:location,card:Card{}}, el array siempre mide el cardsLimit despues de iniciar
 
     constructor(id, name, ws) {
         this.id = id;
@@ -81,7 +81,18 @@ class User {
 
     getCard(location){
         let datosCarta = this.cartas.find(card=>card.location===location);
-        return datosCarta.card;
+        return datosCarta;
+    }
+
+    getRandomCard(){
+        let cartasDisponibles = [];
+        for (let i in this.cartas){
+            if (this.cartas[i].card !== null){
+                cartasDisponibles.push(i);
+            }
+        }
+        let randomCardIndex = cartasDisponibles[Math.floor(Math.random()*cartasDisponibles.length)];
+        return this.cartas[randomCardIndex];
     }
 
     deleteCard(location){

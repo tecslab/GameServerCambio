@@ -16,7 +16,8 @@ module.exports = {
     // Game messages
     CARTA_INICIAL: {message:"Ver carta inicial"},
     MOSTRAR_CARTA: (card) => ({message:"Mostrar carta", card: card}),
-    PINTAR_CARTAS: (cards) => ({message:"Pintar cartas", cards})
+    PINTAR_CARTAS: (cards) => ({message:"Pintar cartas", cards}),
+    PEDIR_CARTA: () => ({message:"Selecciona carta a eliminar"}),
     CAMBIAR_CARTAS: (card1, card2) => ({message:"Cambio de cartas", card1, card2}), //Para mostrar a los jugadores que cartas se cambiaron
     DESCARTAR_CARTAS: (card1, card2) => ({message:"Cambio de cartas", card1, card2}),
     TURNO_ETAPA1: (token, turnoCount, card) => ({message:"Turno etapa 1", token, turnoCount, card}),
