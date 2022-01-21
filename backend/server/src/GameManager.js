@@ -16,9 +16,8 @@ class GameManager{
   turnCount = 0;
   turnToken = 0; // token del turno actual. Valores desde 0 a maxUser - 1
   jugando = true; // se setea en false después del último turno
-  etapa1 = false;
-  etapa2 = false;
-  intervaloEtapa2 = ";"
+  intervaloEtapa1 = "";
+  intervaloEtapa2 = ""
 
   constructor(room){
     this.players = room.users;
@@ -62,61 +61,82 @@ class GameManager{
   }
 
   startGame(){
+    this.room.sendDataToEveryone(messages.CARTA_INICIAL);
     setTimeout(() => {
       //En este tiempo se recibirán la carta que quiere ver de inicio el jugador
-      this.etapa1 = true;
-      this.motorFases.avanzar();
       this.bodyGame();
-    },timePreJuego);
-    this.room.sendDataToEveryone(messages.CARTA_INICIAL);
+    }, timePreJuego);
   }
 
   bodyGame(){
     while (this.jugando === true){
-      this.frontMazoCard = new Card(); 
+      this.motorFases.avanzar(); //Se posiciona en etapa1
+      this.frontMazoCard = new Card(); // Se envía la posible carta que tome el jugador
       this.room.sendDataToEveryone(messages.TURNO_ETAPA1(this.turnToken, this.turnCount, this.frontMazoCard));
-      setTimeout(()=>{
-        this.etapa1=false;
+      this.intervaloEtapa1 = setTimeout(()=>{
+        // se actualiza el descarte con la carta que estaba en el mazo
+        let descarte = {idLugar: 'descarte'};
+        this.cambiarCartas(this.frontMazoCard, descarte);
+        this.motorFases.avanzar();// pasa a la etapa2
       },timeEtapa1);
-      while (this.etapa1===true){
-        //Espera ha que pase la etapa1 del turno
+      while (this.motorFases.getFaseActual()==='etapa1'){
+        //Espera a que pase la etapa1 del turno
       }
       //Etapa2
       this.descarteActivo = true;
       this.intervaloEtapa2 = setTimeout(()=>{
-        this.etapa2=false;
+        this.motorFases.avanzar();
       },timeEtapa2);
-      while (this.etapa2===true){
+      while (this.motorFases.getFaseActual()==='etapa2'){
         // Espera hasta que etapa2 sea falso
-      }
-      //actualizar el token
+      }      
+      this.descarteActivo = false;
+      this.nextToken(this.turnToken);
+      this.turnCount++;
     }
   }
 
   accionEtapa1(player, data){
+    // Cuando el jugador de turno vea la carta que obtuvo del mazo
+    // y decida que hacer con ella. También puede optar por tomar la carta del descarte
     let { accion, ubicacionCarta1, ubicacionCarta2 } = data;
     this.room.sendDataToEveryone(messages.PINTAR_CARTAS([ubicacionCarta1, ubicacionCarta2])); // se muestra a todos los demás la ubicación
     // de las cartas que se refieren a la acción del jugador
-    if ( accion === "descartar"){
-      // Si es descarte, carta1 va al descarte, la carta2 no existe
-      ubicacionCarta2 = {idLugar: 'descarte'};
-      this.cambiarCartas(ubicacionCarta1, ubicacionCarta2);
-    }else if( accion === "cambiar"){
-      // puede ser cambio entre 2 cartas (por carta de efecto de cambio),
-      // descarte de carta propia para reemplazarla por la carta que salio en el mazo,
-      // o cambio de la carta del descarte por una propia
-      this.cambiarCartas(ubicacionCarta1, ubicacionCarta2);
-    }else if( accion === "mostrar"){
-      // puede ser una carta propia o una ajena
-      let carta = this.localizarCarta(ubicacionCarta1).carta;
-      player.sendData(carta);
-      if ( this.frontMazoCard.name === "KN" ){
-        //Al jugador se le envía el valor de la carta
-        //Se podría implementar aqui un clearTimeout y otro setTimeout para alargar el tiempo para cambiar las cartas
-      }else{
-        this.etapa1 = false;
-        this.etapa2 = true;
-      }
+    switch (accion) {
+      case "descartar":
+        // cuando la carta que tomó del mazo la descarta
+        // Si es descarte, carta1 va al descarte, la carta2 no existe
+        this.enviarMazoAlDescarte();
+        this.motorFases.avanzar();
+        break;
+      case "cambiar":
+        // cambio entre 2 cartas (por carta de efecto de cambio),
+        this.cambiarCartas(ubicacionCarta1, ubicacionCarta2);
+        this.enviarMazoAlDescarte();
+        this.motorFases.avanzar();
+        break;
+      case "tomar":
+        // Envía una carta propia al descarte y la cambia por la que está en el mazo
+        // o toma la carta del descarte y la reemplaza por una propia
+        this.cambiarCartas(ubicacionCarta1, ubicacionCarta2);
+        this.motorFases.avanzar();
+        break;
+      case "mostrar":{
+        // puede ser una carta propia o una ajena
+        let carta = this.localizarCarta(ubicacionCarta1).carta;
+        player.sendData(carta);
+        if ( this.frontMazoCard.name === "KN" ){
+          clearTimeout(this.intervaloEtapa1);
+          setTimeout(()=>{
+            this.enviarMazoAlDescarte();
+            this.motorFases.avanzar();  
+          }, timeToSelectCard);
+        }else{
+          this.enviarMazoAlDescarte();
+          this.motorFases.avanzar();
+        }
+        break;
+      } 
     }
     this.frontMazoCard = null;
   }
@@ -126,8 +146,8 @@ class GameManager{
     let {ubicacionCarta1, ubicacionCarta2} = data;
     this.room.sendDataToEveryone(messages.PINTAR_CARTAS([ubicacionCarta1, ubicacionCarta2]));
     this.cambiarCartas(ubicacionCarta1, ubicacionCarta2);
-    this.etapa1 = false;
-    this.etapa2 = true;
+    this.enviarMazoAlDescarte();
+    this.motorFases.avanzar();
   }
 
   emparejarCartas(player, data){
@@ -147,10 +167,10 @@ class GameManager{
           setTimeout(()=>{
             let datosNulos = null;
             this.pasarCarta(datosCarta.owner, player.id, datosNulos); // pasa al otro jugador una carta aleatoria
-            this.etapa2 = false;
+            this.motorFases.avanzar();
           }, timeToSelectCard);
         }else{
-          this.etapa2 = false;
+          this.motorFases.avanzar();
         }
       }else{
         player.penaltyCard();
@@ -167,7 +187,7 @@ class GameManager{
       card = owner.getRandomCard();
     }else{
       card = owner.getCard(ubicacionCarta);
-      this.etapa2 = false;
+      this.motorFases.avanzar(card);
     }
     secondPlayer.pushCard(card.location, card.card);
   }
@@ -177,6 +197,10 @@ class GameManager{
     return player;
   }
 
+  enviarMazoAlDescarte(){
+    this.descarte = this.frontMazoCard;
+    this.frontMazoCard = null;
+  }
   
   nextToken(prevToken){
     // Genera un token actualizado
@@ -199,24 +223,24 @@ class GameManager{
   }
 
   localizarCarta(idLugar, location){
-      //Encuentra el valor de la carta en la posición solicitada
-      //idLugar puede ser mazo, descarte o un id de un Jugador
-      let carta={};
-      let owner;
-      switch(idLugar){
-          case 'mazo':
-              carta = this.frontMazoCard;
-              break;
-          case 'descarte':
-              carta = this.descarte;
-              break;
-          default:
-              // La carta tiene id de jugador(user)
-              owner = this.users.find(user => user.id === idLugar);
-              carta = owner.getCard(location).card;
-              break;
-      }
-      return { carta, owner};
+    //Encuentra el valor de la carta en la posición solicitada
+    //idLugar puede ser mazo, descarte o un id de un Jugador
+    let carta={};
+    let owner;
+    switch(idLugar){
+      case 'mazo':
+        carta = this.frontMazoCard;
+        break;
+      case 'descarte':
+        carta = this.descarte;
+        break;
+      default:
+        // La carta tiene id de jugador(user)
+        owner = this.users.find(user => user.id === idLugar);
+        carta = owner.getCard(location).card;
+        break;
+    }
+    return { carta, owner};
   }
 
   pushCard(idLugar, location, card){
